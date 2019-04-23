@@ -12,21 +12,21 @@ namespace HotkeyVolumeChanger
 		internal KeyPressedEventArgs(Keys key)
 		{
 			_key = key;
-			if (key.ToString() == Form1.get_key(1))
+			if (key.ToString() == HotkeyVolumeChanger.get_key(1))
 			{
-				AudioManager.SetApplicationVolume(Form1.getPID(), Form1.getVol1());
+				AudioManager.SetApplicationVolume(HotkeyVolumeChanger.getPID(), HotkeyVolumeChanger.getVol1());
 			}
-			else if (key.ToString() == Form1.get_key(2))
+			else if (key.ToString() == HotkeyVolumeChanger.get_key(2))
 			{
-				AudioManager.SetApplicationVolume(Form1.getPID(), Form1.getVol2());
+				AudioManager.SetApplicationVolume(HotkeyVolumeChanger.getPID(), HotkeyVolumeChanger.getVol2());
 			}
-            else if (key.ToString() == Form1.get_key(3))
+            else if (key.ToString() == HotkeyVolumeChanger.get_key(3))
             {
-                AudioManager.SetApplicationVolume(Form1.getPID(), Form1.getVol3());
+                AudioManager.SetApplicationVolume(HotkeyVolumeChanger.getPID(), HotkeyVolumeChanger.getVol3());
             }
-            else if (key.ToString() == Form1.get_key(4))
+            else if (key.ToString() == HotkeyVolumeChanger.get_key(4))
             {
-                AudioManager.SetApplicationVolume(Form1.getPID(), Form1.getVol4());
+                AudioManager.SetApplicationVolume(HotkeyVolumeChanger.getPID(), HotkeyVolumeChanger.getVol4());
             }
         }
 	}

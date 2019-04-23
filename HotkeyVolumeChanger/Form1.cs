@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace HotkeyVolumeChanger
 {
-	public class Form1 : Form
+	public class HotkeyVolumeChanger : Form
 	{
 		private KeyboardHook hook = new KeyboardHook();
 		private TypeConverter converter = TypeDescriptor.GetConverter(typeof(Keys));
@@ -56,7 +56,7 @@ namespace HotkeyVolumeChanger
         private int nrOfHotkeys;
         private string pubgPID;
 
-		public Form1()
+		public HotkeyVolumeChanger()
 		{
 			InitializeComponent();
             numberOfHotkeys = new List<string>();
@@ -278,7 +278,7 @@ namespace HotkeyVolumeChanger
 		private void InitializeComponent()
 		{
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HotkeyVolumeChanger));
             this.buttonBindKeys = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
@@ -612,7 +612,7 @@ namespace HotkeyVolumeChanger
             this.label9.TabIndex = 24;
             this.label9.Text = "# Hotkeys";
             // 
-            // Form1
+            // HotkeyVolumeChanger
             // 
             this.AccessibleDescription = "Changes applications volume with hotkeys";
             this.AccessibleName = "HotkeyVolumeChanger";
@@ -645,9 +645,10 @@ namespace HotkeyVolumeChanger
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "Form1";
+            this.Name = "HotkeyVolumeChanger";
             this.Text = "Hotkey Volume Changer";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
