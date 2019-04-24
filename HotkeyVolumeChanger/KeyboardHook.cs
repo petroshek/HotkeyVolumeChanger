@@ -83,7 +83,8 @@ namespace HotkeyVolumeChanger
 
         public void DisposeKey(Keys key)
         {
-            foreach(BoundKey BK in keyList)
+            var temp = keyList.ToArray();
+            foreach(BoundKey BK in temp)
             {
                 if(BK.Key == key)
                 {
