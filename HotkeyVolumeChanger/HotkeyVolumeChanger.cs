@@ -20,11 +20,16 @@ namespace HotkeyVolumeChanger
 		private static float vol2;
         private static float vol3;
         private static float vol4;
-        private static bool bound;
+        private static bool allBound;
+        private static bool oneAndTwoBound;
+        private static bool threeAndFourBound;
         private ListBox listBox1;
 		private DataTable dt;
-		private static int pid;
-		private IContainer components;
+		private static int pidkey1;
+        private static int pidkey2;
+        private static int pidkey3;
+        private static int pidkey4;
+        private IContainer components;
 		private Button buttonBindKeys;
 		private TextBox textBox1;
 		private TextBox textBox2;
@@ -49,11 +54,10 @@ namespace HotkeyVolumeChanger
         private Label label6;
         private Label label7;
         private Label label8;
-        private ComboBox comboBox1;
-        private Label label9;
         private ToolStripMenuItem exitToolStripMenuItem;
         private List<string> numberOfHotkeys;
-        private int nrOfHotkeys;
+        private Button buttonBindKey1And2;
+        private Button buttonBindKey3And4;
         private string pubgPID;
 
 		public HotkeyVolumeChanger()
@@ -64,8 +68,6 @@ namespace HotkeyVolumeChanger
             numberOfHotkeys.Add("2");
             numberOfHotkeys.Add("3");
             numberOfHotkeys.Add("4");
-            comboBox1.DataSource = numberOfHotkeys;
-            comboBox1.SelectedIndex = 3;
             base.Resize += Form1_Resize;
 			notifyIcon1.MouseDoubleClick += notifyIcon1_MouseDoubleClick;
 			createDataTable();
@@ -163,75 +165,100 @@ namespace HotkeyVolumeChanger
 
 		private void buttonBindKeys_Click(object sender, EventArgs e)
 		{
-			if (bound)
+			if (allBound || oneAndTwoBound || threeAndFourBound)
 			{
-				hook.Dispose();
-				hook = new KeyboardHook();
-			}
-            if(comboBox1.SelectedValue.ToString() == "1")
-            {
-                nrOfHotkeys = 1;
-                key1 = textBox1.Text;
+                hook.DisposeKey((Keys)converter.ConvertFromString(key1));
+                hook.DisposeKey((Keys)converter.ConvertFromString(key2));
+                hook.DisposeKey((Keys)converter.ConvertFromString(key3));
+                hook.DisposeKey((Keys)converter.ConvertFromString(key4));
+                if (hook == null)
+                    hook = new KeyboardHook();
+                allBound = false;
+                oneAndTwoBound = false;
+                threeAndFourBound = false;
             }
-            else if (comboBox1.SelectedValue.ToString() == "2")
-            {
-                nrOfHotkeys = 2;
-                key1 = textBox1.Text;
-                key2 = textBox2.Text;
-            }
-            else if (comboBox1.SelectedValue.ToString() == "3")
-            {
-                nrOfHotkeys = 3;
-                key1 = textBox1.Text;
-                key2 = textBox2.Text;
-                key3 = textBox3.Text;
-            }
-            else if (comboBox1.SelectedValue.ToString() == "4")
-            {
-                nrOfHotkeys = 4;
-                key1 = textBox1.Text;
-                key2 = textBox2.Text;
-                key3 = textBox3.Text;
-                key4 = textBox4.Text;
-            }
-            CheckInput();
-		}
 
-        private void CheckInput()
-        {
-            if (!float.TryParse(textBoxVol1.Text, out vol1) || !float.TryParse(textBoxVol2.Text, out vol2) || !float.TryParse(textBoxVol3.Text, out vol3) || !float.TryParse(textBoxVol4.Text, out vol4))
-            {
-                MessageBox.Show("Make sure volume is between 0-100");
-            }
-            else if (vol1 < 0f || vol1 > 100f || vol2 < 0f || vol2 > 100f || vol3 < 0f || vol3 > 100f || vol4 < 0f || vol4 > 100f)
-            {
-                MessageBox.Show("Make sure volume is between 0-100");
-            }
-            if (!int.TryParse(listBox1.SelectedValue.ToString(), out pid))
-            {
-                MessageBox.Show("Make sure you have selected an application");
-            }
-            try
-            {
-                hook.RegisterHotKey((Keys)converter.ConvertFromString(key1));
-                if (nrOfHotkeys > 1)
-                    hook.RegisterHotKey((Keys)converter.ConvertFromString(key2));
-                if(nrOfHotkeys > 2)
-                    hook.RegisterHotKey((Keys)converter.ConvertFromString(key3));
-                if (nrOfHotkeys > 3)
-                    hook.RegisterHotKey((Keys)converter.ConvertFromString(key4));
-            }
-            catch
-            {
-                MessageBox.Show("Make sure the hotkeys are correctly typed");
-            }
-            bound = true;
+            key1 = textBox1.Text;
+            key2 = textBox2.Text;
+            key3 = textBox3.Text;
+            key4 = textBox4.Text;
+
+            List<TextBox> buttons = new List<TextBox>();
+            buttons.Add(textBoxVol1);
+            buttons.Add(textBoxVol2);
+            buttons.Add(textBoxVol3);
+            buttons.Add(textBoxVol4);
+            CheckInput(buttons);
+            allBound = true;
         }
 
-        public static int getPID()
+        private void CheckInput(List<TextBox> buttons)
+        {
+            foreach(TextBox TB in buttons)
+            {
+                float vol;
+                string key = "";
+                int pid;
+                if (!float.TryParse(TB.Text, out vol))
+                {
+                    MessageBox.Show("Make sure volume is between 0-100");
+                }
+                else if (vol < 0f || vol > 100f)
+                {
+                    MessageBox.Show("Make sure volume is between 0-100");
+                }
+                if (!int.TryParse(listBox1.SelectedValue.ToString(), out pid))
+                {
+                    MessageBox.Show("Make sure you have selected an application");
+                }
+
+                if (TB.Name == "textBoxVol1")
+                {
+                    vol1 = vol;
+                    key = key1;
+                    pidkey1 = pid;
+                }
+                else if (TB.Name == "textBoxVol2")
+                {
+                    vol2 = vol;
+                    key = key2;
+                    pidkey2 = pid;
+                }
+                else if (TB.Name == "textBoxVol3")
+                {
+                    vol3 = vol;
+                    key = key3;
+                    pidkey3 = pid;
+                }
+                else if (TB.Name == "textBoxVol4")
+                {
+                    vol4 = vol;
+                    key = key4;
+                    pidkey4 = pid;
+                }
+
+                try
+                {
+                    hook.RegisterHotKey((Keys)converter.ConvertFromString(key));
+                }
+                catch
+                {
+                    MessageBox.Show("Make sure the hotkeys are correctly typed");
+                }
+            }
+        }
+
+        public static int GetPID(int hotkey)
 		{
-			return pid;
-		}
+            if(hotkey == 1)
+			    return pidkey1;
+            else if (hotkey == 2)
+                return pidkey2;
+            else if (hotkey == 3)
+                return pidkey3;
+            else
+                return pidkey4;
+        }
 
 		private void buttonRefreshProcesses_Click(object sender, EventArgs e)
 		{
@@ -248,19 +275,19 @@ namespace HotkeyVolumeChanger
 			MessageBox.Show("Select the correct application in the list.\nMake sure you are using valid hotkeys, e.g. F1, F2, A, B etc.\nVolume must be between 0 and 100.\nIf you want to control multiple applications volume, you need to start more of this application\nHotkey1 will change the volume to Vol1's value, Hotkey2 will change the volume to Vol2's value, etc.\n\nThe program uses windows built-in Volume Mixer to change the volume, with other words nothing sketchy what so ever.\n\nPetroshek #2445 on discord if you want something added or changed\n");
 		}
 
-		public static float getVol1()
+		public static float GetVol1()
 		{
 			return vol1;
 		}
-		public static float getVol2()
+		public static float GetVol2()
 		{
 			return vol2;
 		}
-        public static float getVol3()
+        public static float GetVol3()
         {
             return vol3;
         }
-        public static float getVol4()
+        public static float GetVol4()
         {
             return vol4;
         }
@@ -268,11 +295,12 @@ namespace HotkeyVolumeChanger
 
         protected override void Dispose(bool disposing)
 		{
-			if (disposing && components != null)
+            if (disposing && components != null)
 			{
-				components.Dispose();
+                hook.Dispose();
+                components.Dispose();
 			}
-			base.Dispose(disposing);
+            base.Dispose(disposing);
 		}
 
 		private void InitializeComponent()
@@ -305,25 +333,26 @@ namespace HotkeyVolumeChanger
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.buttonBindKey1And2 = new System.Windows.Forms.Button();
+            this.buttonBindKey3And4 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonBindKeys
             // 
             this.buttonBindKeys.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonBindKeys.Location = new System.Drawing.Point(136, 418);
+            this.buttonBindKeys.Location = new System.Drawing.Point(13, 430);
             this.buttonBindKeys.Margin = new System.Windows.Forms.Padding(4);
             this.buttonBindKeys.Name = "buttonBindKeys";
-            this.buttonBindKeys.Size = new System.Drawing.Size(100, 30);
+            this.buttonBindKeys.Size = new System.Drawing.Size(107, 30);
             this.buttonBindKeys.TabIndex = 1;
-            this.buttonBindKeys.Text = "Bind Keys";
+            this.buttonBindKeys.Text = "Bind All Keys";
             this.buttonBindKeys.UseVisualStyleBackColor = true;
             this.buttonBindKeys.Click += new System.EventHandler(this.buttonBindKeys_Click);
             // 
             // textBox1
             // 
+            this.textBox1.AccessibleName = "Hotkey1";
             this.textBox1.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.Location = new System.Drawing.Point(136, 325);
             this.textBox1.Margin = new System.Windows.Forms.Padding(4);
@@ -336,6 +365,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBox2
             // 
+            this.textBox2.AccessibleName = "Hotkey2";
             this.textBox2.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox2.Location = new System.Drawing.Point(196, 325);
             this.textBox2.Margin = new System.Windows.Forms.Padding(4);
@@ -348,6 +378,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBox3
             // 
+            this.textBox3.AccessibleName = "Hotkey3";
             this.textBox3.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox3.Location = new System.Drawing.Point(256, 325);
             this.textBox3.Margin = new System.Windows.Forms.Padding(4);
@@ -360,6 +391,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBox4
             // 
+            this.textBox4.AccessibleName = "Hotkey4";
             this.textBox4.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox4.Location = new System.Drawing.Point(316, 325);
             this.textBox4.Margin = new System.Windows.Forms.Padding(4);
@@ -374,7 +406,7 @@ namespace HotkeyVolumeChanger
             // 
             this.madeByLabel.AutoSize = true;
             this.madeByLabel.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.madeByLabel.Location = new System.Drawing.Point(256, 425);
+            this.madeByLabel.Location = new System.Drawing.Point(273, 475);
             this.madeByLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.madeByLabel.Name = "madeByLabel";
             this.madeByLabel.Size = new System.Drawing.Size(132, 17);
@@ -383,6 +415,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBoxVol1
             // 
+            this.textBoxVol1.AccessibleName = "Vol1";
             this.textBoxVol1.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxVol1.Location = new System.Drawing.Point(136, 385);
             this.textBoxVol1.Margin = new System.Windows.Forms.Padding(4);
@@ -395,6 +428,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBoxVol2
             // 
+            this.textBoxVol2.AccessibleName = "Vol2";
             this.textBoxVol2.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxVol2.Location = new System.Drawing.Point(196, 385);
             this.textBoxVol2.Margin = new System.Windows.Forms.Padding(4);
@@ -407,6 +441,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBoxVol3
             // 
+            this.textBoxVol3.AccessibleName = "Vol3";
             this.textBoxVol3.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxVol3.Location = new System.Drawing.Point(256, 385);
             this.textBoxVol3.Margin = new System.Windows.Forms.Padding(4);
@@ -419,6 +454,7 @@ namespace HotkeyVolumeChanger
             // 
             // textBoxVol4
             // 
+            this.textBoxVol4.AccessibleName = "Vol4";
             this.textBoxVol4.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxVol4.Location = new System.Drawing.Point(316, 385);
             this.textBoxVol4.Margin = new System.Windows.Forms.Padding(4);
@@ -487,7 +523,7 @@ namespace HotkeyVolumeChanger
             // buttonRefreshProcesses
             // 
             this.buttonRefreshProcesses.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonRefreshProcesses.Location = new System.Drawing.Point(13, 357);
+            this.buttonRefreshProcesses.Location = new System.Drawing.Point(13, 325);
             this.buttonRefreshProcesses.Margin = new System.Windows.Forms.Padding(4);
             this.buttonRefreshProcesses.Name = "buttonRefreshProcesses";
             this.buttonRefreshProcesses.Size = new System.Drawing.Size(107, 85);
@@ -590,27 +626,29 @@ namespace HotkeyVolumeChanger
             this.label8.TabIndex = 21;
             this.label8.Text = "Hotkey3";
             // 
-            // comboBox1
+            // buttonBindKey1And2
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4"});
-            this.comboBox1.Location = new System.Drawing.Point(51, 325);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(47, 25);
-            this.comboBox1.TabIndex = 23;
+            this.buttonBindKey1And2.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonBindKey1And2.Location = new System.Drawing.Point(136, 430);
+            this.buttonBindKey1And2.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonBindKey1And2.Name = "buttonBindKey1And2";
+            this.buttonBindKey1And2.Size = new System.Drawing.Size(110, 30);
+            this.buttonBindKey1And2.TabIndex = 25;
+            this.buttonBindKey1And2.Text = "Bind Key 1+2";
+            this.buttonBindKey1And2.UseVisualStyleBackColor = true;
+            this.buttonBindKey1And2.Click += new System.EventHandler(this.buttonBindKey1And2_Click);
             // 
-            // label9
+            // buttonBindKey3And4
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(48, 300);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(72, 17);
-            this.label9.TabIndex = 24;
-            this.label9.Text = "# Hotkeys";
+            this.buttonBindKey3And4.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonBindKey3And4.Location = new System.Drawing.Point(254, 430);
+            this.buttonBindKey3And4.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonBindKey3And4.Name = "buttonBindKey3And4";
+            this.buttonBindKey3And4.Size = new System.Drawing.Size(110, 30);
+            this.buttonBindKey3And4.TabIndex = 26;
+            this.buttonBindKey3And4.Text = "Bind Key 3+4";
+            this.buttonBindKey3And4.UseVisualStyleBackColor = true;
+            this.buttonBindKey3And4.Click += new System.EventHandler(this.buttonBindKey3And4_Click);
             // 
             // HotkeyVolumeChanger
             // 
@@ -620,9 +658,9 @@ namespace HotkeyVolumeChanger
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Menu;
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(404, 461);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.comboBox1);
+            this.ClientSize = new System.Drawing.Size(404, 498);
+            this.Controls.Add(this.buttonBindKey3And4);
+            this.Controls.Add(this.buttonBindKey1And2);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.textBox4);
@@ -657,5 +695,49 @@ namespace HotkeyVolumeChanger
             this.PerformLayout();
 
 		}
+
+        private void buttonBindKey1And2_Click(object sender, EventArgs e)
+        {
+            if (allBound || oneAndTwoBound)
+            {
+                hook.DisposeKey((Keys)converter.ConvertFromString(key1));
+                hook.DisposeKey((Keys)converter.ConvertFromString(key2));
+                if (hook == null)
+                    hook = new KeyboardHook();
+                allBound = false;
+                oneAndTwoBound = false;
+            }
+
+            key1 = textBox1.Text;
+            key2 = textBox2.Text;
+
+            List<TextBox> buttons = new List<TextBox>();
+            buttons.Add(textBoxVol1);
+            buttons.Add(textBoxVol2);
+            CheckInput(buttons);
+            oneAndTwoBound = true;
+        }
+
+        private void buttonBindKey3And4_Click(object sender, EventArgs e)
+        {
+            if (allBound || threeAndFourBound)
+            {
+                hook.DisposeKey((Keys)converter.ConvertFromString(key3));
+                hook.DisposeKey((Keys)converter.ConvertFromString(key4));
+                if(hook == null)
+                    hook = new KeyboardHook();
+                allBound = false;
+                threeAndFourBound = false;
+            }
+
+            key3 = textBox3.Text;
+            key4 = textBox4.Text;
+
+            List<TextBox> buttons = new List<TextBox>();
+            buttons.Add(textBoxVol3);
+            buttons.Add(textBoxVol4);
+            CheckInput(buttons);
+            threeAndFourBound = true;
+        }
     }
 }

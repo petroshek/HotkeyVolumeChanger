@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -6,6 +7,12 @@ namespace HotkeyVolumeChanger
 {
 	public sealed class KeyboardHook : IDisposable
 	{
+        private class BoundKey
+        {
+            public Keys Key;
+            public int Id;
+        }
+
 		private class Window : NativeWindow, IDisposable
 		{
 			private static int WM_HOTKEY = 786;
@@ -39,6 +46,7 @@ namespace HotkeyVolumeChanger
 		private Window _window = new Window();
 
 		private int _currentId;
+        private List<BoundKey> keyList;
 
 		public event EventHandler<KeyPressedEventArgs> KeyPressed;
 
@@ -50,7 +58,8 @@ namespace HotkeyVolumeChanger
 
 		public KeyboardHook()
 		{
-			_window.KeyPressed += delegate(object sender, KeyPressedEventArgs args)
+            keyList = new List<BoundKey>();
+            _window.KeyPressed += delegate(object sender, KeyPressedEventArgs args)
 			{
 				if (this.KeyPressed != null)
 				{
@@ -62,18 +71,33 @@ namespace HotkeyVolumeChanger
 		public void RegisterHotKey(Keys key)
 		{
 			_currentId++;
-			if (!RegisterHotKey(_window.Handle, _currentId, 0u, (uint)key))
+            BoundKey temp = new BoundKey();
+            temp.Key = key;
+            temp.Id = _currentId;
+            keyList.Add(temp);
+            if (!RegisterHotKey(_window.Handle, _currentId, 0u, (uint)key))
 			{
 				throw new InvalidOperationException("Couldn’t register the hot key.");
 			}
 		}
 
-		public void Dispose()
+        public void DisposeKey(Keys key)
+        {
+            foreach(BoundKey BK in keyList)
+            {
+                if(BK.Key == key)
+                {
+                    UnregisterHotKey(_window.Handle, BK.Id);
+                    keyList.Remove(BK);
+                }
+            }
+
+            if (keyList.Count == 0)
+                Dispose();
+        }
+
+        public void Dispose()
 		{
-			for (int num = _currentId; num > 0; num--)
-			{
-				UnregisterHotKey(_window.Handle, num);
-			}
 			_window.Dispose();
 		}
 	}
