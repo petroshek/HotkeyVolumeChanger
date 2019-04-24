@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -69,7 +69,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -132,7 +132,7 @@
     <Compile Include="HotkeyVolumeChanger\AudioManager.cs" />
     <Compile Include="HotkeyVolumeChanger\EDataFlow.cs" />
     <Compile Include="HotkeyVolumeChanger\ERole.cs" />
-    <Compile Include="HotkeyVolumeChanger\Form1.cs">
+    <Compile Include="HotkeyVolumeChanger\HotkeyVolumeChanger.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="HotkeyVolumeChanger\IAudioEndpointVolume.cs" />
@@ -154,7 +154,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HotkeyVolumeChanger\Form1.resx" />
+    <EmbeddedResource Include="HotkeyVolumeChanger\HotkeyVolumeChanger.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

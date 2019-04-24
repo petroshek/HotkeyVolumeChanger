@@ -12,12 +12,12 @@ namespace HotkeyVolumeChanger
 
 			public event EventHandler<KeyPressedEventArgs> KeyPressed;
 
-			public Window()
-			{
-				CreateHandle(new CreateParams());
-			}
+            public Window()
+            {
+                CreateHandle(new CreateParams());
+            }
 
-			protected override void WndProc(ref Message m)
+            protected override void WndProc(ref Message m)
 			{
 				base.WndProc(ref m);
 				if (m.Msg == WM_HOTKEY)
