@@ -10,25 +10,22 @@ namespace HotkeyVolumeChanger
 {
 	public class HotkeyVolumeChanger : Form
 	{
-		private KeyboardHook hook = new KeyboardHook();
+        public static List<BoundKeys> ListBoundKeys;
+        public static List<string> key;
+        public static List<float> vol;
+        public static List<int> pidkey;
+        public static List<string> numberOfHotkeys;
+
+        public static List<Keys> AllKeys;
+        public static List<Keys> AvailableKeys;
+
+        public static string pubgPID;
+
+        private KeyboardHook hook = new KeyboardHook();
 		private TypeConverter converter = TypeDescriptor.GetConverter(typeof(Keys));
-		private static string key1;
-		private static string key2;
-        private static string key3;
-        private static string key4;
-        private static float vol1;
-		private static float vol2;
-        private static float vol3;
-        private static float vol4;
-        private static bool allBound;
-        private static bool oneAndTwoBound;
-        private static bool threeAndFourBound;
+
         private ListBox listBox1;
-		private DataTable dt;
-		private static int pidkey1;
-        private static int pidkey2;
-        private static int pidkey3;
-        private static int pidkey4;
+		private DataTable dt;        
         private IContainer components;
 		private Button buttonBindKeys;
 		private TextBox textBox1;
@@ -54,15 +51,23 @@ namespace HotkeyVolumeChanger
         private Label label6;
         private Label label7;
         private Label label8;
-        private ToolStripMenuItem exitToolStripMenuItem;
-        private List<string> numberOfHotkeys;
+        private ToolStripMenuItem exitToolStripMenuItem;        
         private Button buttonBindKey1And2;
-        private Button buttonBindKey3And4;
-        private string pubgPID;
+        private Button buttonBindKey3And4;        
 
 		public HotkeyVolumeChanger()
 		{
 			InitializeComponent();
+
+            ListBoundKeys = new List<BoundKeys>();  // All bound keys
+            vol = new List<float>();
+            pidkey = new List<int>();
+            key = new List<string>();
+
+            AllKeys = new List<Keys>();             // All keys
+            AvailableKeys = new List<Keys>();       // All non-bound keys
+
+
             numberOfHotkeys = new List<string>();
             numberOfHotkeys.Add("1");
             numberOfHotkeys.Add("2");
@@ -112,14 +117,7 @@ namespace HotkeyVolumeChanger
 
 		public static string get_key(int nr)
 		{
-            if (nr == 1)
-                return key1;
-            else if (nr == 2)
-                return key2;
-            else if (nr == 3)
-                return key3;
-            else
-                return key4;
+            return key[nr];
 		}
 
 		private void createDataTable()
@@ -165,99 +163,121 @@ namespace HotkeyVolumeChanger
 
 		private void buttonBindKeys_Click(object sender, EventArgs e)
 		{
-			if (allBound || oneAndTwoBound || threeAndFourBound)
-			{
-                hook.DisposeKey((Keys)converter.ConvertFromString(key1));
-                hook.DisposeKey((Keys)converter.ConvertFromString(key2));
-                hook.DisposeKey((Keys)converter.ConvertFromString(key3));
-                hook.DisposeKey((Keys)converter.ConvertFromString(key4));
-                if (hook == null)
-                    hook = new KeyboardHook();
-                allBound = false;
-                oneAndTwoBound = false;
-                threeAndFourBound = false;
+            key.Clear();
+            key.Add(textBox1.Text);
+            key.Add(textBox2.Text);
+            key.Add(textBox3.Text);
+            key.Add(textBox4.Text);
+
+            foreach (string S in key)
+            {
+                foreach (BoundKeys BK in ListBoundKeys)
+                {
+                    try
+                    {
+                        if ((Keys)converter.ConvertFromString(S) == BK.Key)
+                            ListBoundKeys.Remove(BK);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Make sure the hotkeys are correctly typed");
+                    }
+                }
+                CheckInput(S);
             }
-
-            key1 = textBox1.Text;
-            key2 = textBox2.Text;
-            key3 = textBox3.Text;
-            key4 = textBox4.Text;
-
-            List<TextBox> buttons = new List<TextBox>();
-            buttons.Add(textBoxVol1);
-            buttons.Add(textBoxVol2);
-            buttons.Add(textBoxVol3);
-            buttons.Add(textBoxVol4);
-            CheckInput(buttons);
-            allBound = true;
+            if (hook == null)
+                    hook = new KeyboardHook();            
         }
 
-        private void CheckInput(List<TextBox> buttons)
+        private void buttonBindKey1And2_Click(object sender, EventArgs e)
         {
-            foreach(TextBox TB in buttons)
+            key.Clear();
+            key.Add(textBox1.Text);
+            key.Add(textBox2.Text);
+
+            foreach (string S in key)
             {
-                float vol;
-                string key = "";
-                int pid;
-                if (!float.TryParse(TB.Text, out vol))
+                foreach (BoundKeys BK in ListBoundKeys)
                 {
-                    MessageBox.Show("Make sure volume is between 0-100");
+                    try
+                    {
+                        if ((Keys)converter.ConvertFromString(S) == BK.Key)
+                            ListBoundKeys.Remove(BK);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Make sure the hotkeys are correctly typed");
+                    }
                 }
-                else if (vol < 0f || vol > 100f)
-                {
-                    MessageBox.Show("Make sure volume is between 0-100");
-                }
-                if (!int.TryParse(listBox1.SelectedValue.ToString(), out pid))
-                {
-                    MessageBox.Show("Make sure you have selected an application");
-                }
+                CheckInput(S);
+            }
+            if (hook == null)
+                hook = new KeyboardHook();            
+        }
 
-                if (TB.Name == "textBoxVol1")
-                {
-                    vol1 = vol;
-                    key = key1;
-                    pidkey1 = pid;
-                }
-                else if (TB.Name == "textBoxVol2")
-                {
-                    vol2 = vol;
-                    key = key2;
-                    pidkey2 = pid;
-                }
-                else if (TB.Name == "textBoxVol3")
-                {
-                    vol3 = vol;
-                    key = key3;
-                    pidkey3 = pid;
-                }
-                else if (TB.Name == "textBoxVol4")
-                {
-                    vol4 = vol;
-                    key = key4;
-                    pidkey4 = pid;
-                }
+        private void buttonBindKey3And4_Click(object sender, EventArgs e)
+        {
+            key.Clear();
+            key.Add(textBox3.Text);
+            key.Add(textBox4.Text);
 
-                try
+            foreach (string S in key)
+            {
+                foreach (BoundKeys BK in ListBoundKeys)
                 {
-                    hook.RegisterHotKey((Keys)converter.ConvertFromString(key));
+                    try
+                    {
+                        if ((Keys)converter.ConvertFromString(S) == BK.Key)
+                            ListBoundKeys.Remove(BK);
+                    }
+                    catch(Exception)
+                    {
+                        MessageBox.Show("Make sure the hotkeys are correctly typed");
+                    }
                 }
-                catch
-                {
-                    MessageBox.Show("Make sure the hotkeys are correctly typed");
-                }
+                CheckInput(S);
+            }
+            if (hook == null)
+                hook = new KeyboardHook();            
+        }
+
+        private void CheckInput(string S)
+        {
+            float vol;
+            string tempkey = string.Empty;
+            int pid;
+            if (!float.TryParse(S, out vol))
+            {
+                MessageBox.Show("Make sure volume is between 0-100");
+            }
+            else if (vol < 0f || vol > 100f)
+            {
+                MessageBox.Show("Make sure volume is between 0-100");
+            }
+            if (!int.TryParse(listBox1.SelectedValue.ToString(), out pid))
+            {
+                MessageBox.Show("Make sure you have selected an application");
+            }
+
+            try
+            {
+                hook.RegisterHotKey((Keys)converter.ConvertFromString(S));
+
+                BoundKeys temp = new BoundKeys();
+                temp.Vol = vol;
+                temp.PID = pid;
+                temp.Key = (Keys)converter.ConvertFromString(S);
+                ListBoundKeys.Add(temp);
+            }
+            catch
+            {
+                MessageBox.Show("Make sure the hotkeys are correctly typed");
             }
         }
 
         public static int GetPID(int hotkey)
 		{
-            if(hotkey == 1)
-			    return pidkey1;
-            else if (hotkey == 2)
-                return pidkey2;
-            else if (hotkey == 3)
-                return pidkey3;
-            else
-                return pidkey4;
+            return pidkey[hotkey];
         }
 
 		private void buttonRefreshProcesses_Click(object sender, EventArgs e)
@@ -273,25 +293,7 @@ namespace HotkeyVolumeChanger
 		private void infoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			MessageBox.Show("Select the correct application in the list.\nMake sure you are using valid hotkeys, e.g. F1, F2, A, B etc.\nVolume must be between 0 and 100.\nIf you want to control multiple applications volume, you need to start more of this application\nHotkey1 will change the volume to Vol1's value, Hotkey2 will change the volume to Vol2's value, etc.\n\nThe program uses windows built-in Volume Mixer to change the volume, with other words nothing sketchy what so ever.\n\nPetroshek #2445 on discord if you want something added or changed\n");
-		}
-
-		public static float GetVol1()
-		{
-			return vol1;
-		}
-		public static float GetVol2()
-		{
-			return vol2;
-		}
-        public static float GetVol3()
-        {
-            return vol3;
-        }
-        public static float GetVol4()
-        {
-            return vol4;
-        }
-
+		}        
 
         protected override void Dispose(bool disposing)
 		{
@@ -695,49 +697,12 @@ namespace HotkeyVolumeChanger
             this.PerformLayout();
 
 		}
+    }
 
-        private void buttonBindKey1And2_Click(object sender, EventArgs e)
-        {
-            if (allBound || oneAndTwoBound)
-            {
-                hook.DisposeKey((Keys)converter.ConvertFromString(key1));
-                hook.DisposeKey((Keys)converter.ConvertFromString(key2));
-                if (hook == null)
-                    hook = new KeyboardHook();
-                allBound = false;
-                oneAndTwoBound = false;
-            }
-
-            key1 = textBox1.Text;
-            key2 = textBox2.Text;
-
-            List<TextBox> buttons = new List<TextBox>();
-            buttons.Add(textBoxVol1);
-            buttons.Add(textBoxVol2);
-            CheckInput(buttons);
-            oneAndTwoBound = true;
-        }
-
-        private void buttonBindKey3And4_Click(object sender, EventArgs e)
-        {
-            if (allBound || threeAndFourBound)
-            {
-                hook.DisposeKey((Keys)converter.ConvertFromString(key3));
-                hook.DisposeKey((Keys)converter.ConvertFromString(key4));
-                if(hook == null)
-                    hook = new KeyboardHook();
-                allBound = false;
-                threeAndFourBound = false;
-            }
-
-            key3 = textBox3.Text;
-            key4 = textBox4.Text;
-
-            List<TextBox> buttons = new List<TextBox>();
-            buttons.Add(textBoxVol3);
-            buttons.Add(textBoxVol4);
-            CheckInput(buttons);
-            threeAndFourBound = true;
-        }
+    public class BoundKeys
+    {
+        public Keys Key { get; set; }
+        public float Vol { get; set; }
+        public int PID { get; set; }
     }
 }
