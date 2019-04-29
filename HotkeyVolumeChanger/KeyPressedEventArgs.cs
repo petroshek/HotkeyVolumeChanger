@@ -12,21 +12,23 @@ namespace HotkeyVolumeChanger
 		internal KeyPressedEventArgs(Keys key)
 		{
 			_key = key;
-			if (key.ToString() == HotkeyVolumeChanger.get_key(1))
-			{
-				AudioManager.SetApplicationVolume(HotkeyVolumeChanger.GetPID(1), HotkeyVolumeChanger.GetVol1());
-			}
-			else if (key.ToString() == HotkeyVolumeChanger.get_key(2))
-			{
-				AudioManager.SetApplicationVolume(HotkeyVolumeChanger.GetPID(2), HotkeyVolumeChanger.GetVol2());
-			}
-            else if (key.ToString() == HotkeyVolumeChanger.get_key(3))
+            foreach(BoundKeys BK in HotkeyVolumeChanger.ListBoundKeys)
             {
-                AudioManager.SetApplicationVolume(HotkeyVolumeChanger.GetPID(3), HotkeyVolumeChanger.GetVol3());
-            }
-            else if (key.ToString() == HotkeyVolumeChanger.get_key(4))
-            {
-                AudioManager.SetApplicationVolume(HotkeyVolumeChanger.GetPID(4), HotkeyVolumeChanger.GetVol4());
+                if(_key == BK.Key)
+                {
+                    if (BK.ToggleVol)
+                    {
+                        if (BK.Vol == 0.0F)
+                            BK.Vol = BK.Vol1;
+                        AudioManager.SetApplicationVolume(BK.PID, BK.Vol);
+                        if (BK.Vol == BK.Vol1)
+                            BK.Vol = BK.Vol2;
+                        else
+                            BK.Vol = BK.Vol1;
+                    }
+                    else
+                        AudioManager.SetApplicationVolume(BK.PID, BK.Vol);
+                }
             }
         }
 	}
