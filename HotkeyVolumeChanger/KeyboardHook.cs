@@ -9,7 +9,7 @@ namespace HotkeyVolumeChanger
 	{
         private class BoundKey
         {
-            public Keys Key;
+            public BoundKeys Key;
             public int Id;
         }
 
@@ -68,14 +68,14 @@ namespace HotkeyVolumeChanger
 			};
 		}
 
-		public void RegisterHotKey(Keys key)
+		public void RegisterHotKey(BoundKeys BK)
 		{
 			_currentId++;
             BoundKey temp = new BoundKey();
-            temp.Key = key;
+            temp.Key = BK;
             temp.Id = _currentId;
             keyList.Add(temp);
-            if (!RegisterHotKey(_window.Handle, _currentId, 0u, (uint)key))
+            if (!RegisterHotKey(_window.Handle, _currentId, 0u, (uint)BK.Key))
 			{
 				throw new InvalidOperationException("Couldn’t register the hot key.");
 			}
@@ -86,7 +86,7 @@ namespace HotkeyVolumeChanger
             var temp = keyList.ToArray();
             foreach(BoundKey BK in temp)
             {
-                if(BK.Key == key)
+                if(BK.Key.Key == key)
                 {
                     UnregisterHotKey(_window.Handle, BK.Id);
                     keyList.Remove(BK);

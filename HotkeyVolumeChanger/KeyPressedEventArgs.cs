@@ -19,7 +19,7 @@ namespace HotkeyVolumeChanger
                     if (BK.ToggleVol)
                     {
                         if (BK.Vol == 0.0F)
-                            BK.Vol = BK.Vol1;
+                            BK.Vol = BK.Vol2;
                         AudioManager.SetApplicationVolume(BK.PID, BK.Vol);
                         if (BK.Vol == BK.Vol1)
                             BK.Vol = BK.Vol2;
